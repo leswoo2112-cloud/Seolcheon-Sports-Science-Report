@@ -1,21 +1,20 @@
-/* ==========================================================
-   SEOLCHEON SPORTS SCIENCE PRO
-   Version : 1.0
-   File : main.css
-========================================================== */
+/* ===================================================
+   설천고 스포츠과학 분석센터 PRO
+   main.css
+=================================================== */
 
 :root{
 
-    --bg:#08111d;
-    --sidebar:#0d1828;
-    --card:#132235;
-    --header:#102033;
+    --bg:#071320;
+    --bg2:#0b1c2f;
+    --card:#11243b;
+    --sidebar:#0a1626;
 
-    --primary:#2F80ED;
-    --primary2:#56CCF2;
+    --blue:#2F80ED;
+    --sky:#56CCF2;
 
-    --text:#ffffff;
-    --text2:#b9c4d4;
+    --white:#ffffff;
+    --gray:#9FAEC5;
 
     --border:rgba(255,255,255,.08);
 
@@ -31,17 +30,27 @@
 
 }
 
+html{
+
+    scroll-behavior:smooth;
+
+}
+
 body{
 
-    font-family:Pretendard,sans-serif;
+    font-family:'Pretendard',sans-serif;
 
-    background:linear-gradient(135deg,#08111d,#0b1730,#0d1f3f);
+    background:linear-gradient(135deg,#071320,#091a2d,#0c2440);
 
-    color:var(--text);
+    color:white;
 
     overflow:hidden;
 
 }
+
+/* =======================
+        APP
+======================= */
 
 .app{
 
@@ -53,25 +62,23 @@ body{
 
 }
 
-/* =========================
+/* =======================
         Sidebar
-========================= */
+======================= */
 
 .sidebar{
 
     width:280px;
 
-    background:rgba(13,24,40,.95);
-
-    backdrop-filter:blur(15px);
+    background:rgba(10,22,38,.95);
 
     border-right:1px solid var(--border);
+
+    backdrop-filter:blur(18px);
 
     display:flex;
 
     flex-direction:column;
-
-    box-shadow:var(--shadow);
 
 }
 
@@ -87,31 +94,31 @@ body{
 
 .logo h2{
 
+    color:#56CCF2;
+
     font-size:34px;
 
-    color:var(--primary2);
+    font-weight:700;
 
 }
 
-.logo p{
+.logo span{
+
+    color:#AAB7CB;
+
+    display:block;
 
     margin-top:10px;
-
-    color:var(--text2);
 
     font-size:13px;
 
 }
 
-/* =========================
-        Menu
-========================= */
-
 .sidebar ul{
 
     list-style:none;
 
-    padding:20px;
+    padding:18px;
 
 }
 
@@ -123,25 +130,25 @@ body{
 
     gap:15px;
 
-    padding:15px 18px;
+    padding:15px;
 
-    margin-bottom:10px;
-
-    border-radius:14px;
+    border-radius:15px;
 
     cursor:pointer;
 
+    margin-bottom:8px;
+
     transition:.3s;
 
-    color:var(--text2);
+    color:#AAB7CB;
 
 }
 
 .sidebar li:hover{
 
-    background:rgba(47,128,237,.15);
+    background:#17314e;
 
-    color:#fff;
+    color:white;
 
 }
 
@@ -153,9 +160,17 @@ body{
 
 }
 
-/* =========================
+.sidebar i{
+
+    width:20px;
+
+    text-align:center;
+
+}
+
+/* =======================
         Main
-========================= */
+======================= */
 
 .main{
 
@@ -167,13 +182,17 @@ body{
 
 }
 
-/* =========================
+/* =======================
         Header
-========================= */
+======================= */
 
 .header{
 
     height:80px;
+
+    background:#0d1e33;
+
+    border-bottom:1px solid var(--border);
 
     display:flex;
 
@@ -183,35 +202,35 @@ body{
 
     padding:0 35px;
 
-    background:rgba(16,32,51,.95);
-
-    border-bottom:1px solid var(--border);
-
 }
 
 .header h1{
 
-    font-size:26px;
+    font-size:28px;
 
-    letter-spacing:1px;
-
-}
-
-.header span{
-
-    color:var(--text2);
+    font-weight:700;
 
 }
 
-.header-right{
+.header p{
+
+    margin-top:5px;
+
+    color:#AAB7CB;
+
+    font-size:13px;
+
+}
+
+.header-menu{
 
     display:flex;
 
-    gap:15px;
+    gap:12px;
 
 }
 
-.header-right button{
+.header-menu button{
 
     width:46px;
 
@@ -221,7 +240,7 @@ body{
 
     border-radius:50%;
 
-    background:var(--card);
+    background:#13263d;
 
     color:white;
 
@@ -233,15 +252,14 @@ body{
 
 }
 
-.header-right button:hover{
+.header-menu button:hover{
 
-    background:var(--primary);
+    background:#2F80ED;
 
 }
-
-/* =========================
+/* =======================
         Dashboard
-========================= */
+======================= */
 
 .dashboard{
 
@@ -251,19 +269,19 @@ body{
 
     gap:25px;
 
-    padding:35px;
+    padding:30px;
 
 }
 
 .card{
 
-    background:rgba(19,34,53,.85);
+    background:rgba(17,36,59,.85);
 
     border:1px solid var(--border);
 
     border-radius:18px;
 
-    padding:30px;
+    padding:28px;
 
     box-shadow:var(--shadow);
 
@@ -273,17 +291,21 @@ body{
 
 .card:hover{
 
-    transform:translateY(-6px);
+    transform:translateY(-5px);
 
-    border-color:var(--primary);
+    border-color:var(--blue);
 
 }
 
-.card h3{
+.card h4{
 
-    color:var(--text2);
+    color:var(--gray);
 
     margin-bottom:15px;
+
+    font-size:15px;
+
+    font-weight:500;
 
 }
 
@@ -291,21 +313,85 @@ body{
 
     font-size:42px;
 
-    color:var(--primary2);
+    color:var(--sky);
+
+    font-weight:700;
 
 }
 
-/* =========================
-        Content
-========================= */
+/* =======================
+      빠른 실행
+======================= */
+
+.quick-menu{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:20px;
+
+    padding:0 30px 30px;
+
+}
+
+.quick-btn{
+
+    height:100px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:rgba(17,36,59,.85);
+
+    color:white;
+
+    cursor:pointer;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:12px;
+
+    font-size:16px;
+
+    transition:.3s;
+
+    box-shadow:var(--shadow);
+
+}
+
+.quick-btn:hover{
+
+    background:linear-gradient(135deg,#2F80ED,#56CCF2);
+
+    transform:translateY(-5px);
+
+}
+
+.quick-btn i{
+
+    font-size:28px;
+
+}
+
+/* =======================
+      메인 컨텐츠
+======================= */
 
 #content{
 
     flex:1;
 
-    margin:0 35px 35px;
+    margin:0 30px 30px;
 
-    background:rgba(19,34,53,.75);
+    background:rgba(17,36,59,.85);
 
     border-radius:20px;
 
@@ -313,6 +399,176 @@ body{
 
     box-shadow:var(--shadow);
 
-    overflow:hidden;
+    padding:35px;
+
+    overflow:auto;
+
+}
+
+.welcome-card{
+
+    width:100%;
+
+    height:100%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+}
+
+.welcome-card h2{
+
+    font-size:42px;
+
+    margin-bottom:20px;
+
+}
+
+.welcome-card p{
+
+    color:var(--gray);
+
+    line-height:1.8;
+
+    max-width:850px;
+
+    font-size:17px;
+
+}
+
+/* =======================
+      Scroll
+======================= */
+
+::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#0a1626;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#2F80ED;
+
+    border-radius:20px;
+
+}
+
+/* =======================
+      반응형
+======================= */
+
+@media(max-width:1400px){
+
+.dashboard{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+.quick-menu{
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:900px){
+
+.sidebar{
+
+    width:90px;
+
+}
+
+.sidebar span{
+
+    display:none;
+
+}
+
+.logo span{
+
+    display:none;
+
+}
+
+.header{
+
+    padding:0 20px;
+
+}
+
+.header h1{
+
+    font-size:22px;
+
+}
+
+.dashboard{
+
+    grid-template-columns:1fr;
+
+    padding:20px;
+
+}
+
+.quick-menu{
+
+    grid-template-columns:1fr;
+
+    padding:0 20px 20px;
+
+}
+
+#content{
+
+    margin:0 20px 20px;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.header-menu button{
+
+    width:40px;
+
+    height:40px;
+
+}
+
+.card h2{
+
+    font-size:32px;
+
+}
+
+.welcome-card h2{
+
+    font-size:28px;
+
+}
+
+.welcome-card p{
+
+    font-size:15px;
+
+}
 
 }
