@@ -1,199 +1,411 @@
 /*
-==========================================================
-설천고 스포츠과학 분석센터 PRO
-Version : 1.0
-File : app.js
-==========================================================
+=========================================================
+ 설천고 스포츠과학 분석센터 PRO
+ File : app.js
+ Part 1
+=========================================================
 */
 
-class SportsScienceApp {
+document.addEventListener("DOMContentLoaded", startApp);
 
-    constructor() {
+/* ===============================
+   프로그램 시작
+=============================== */
 
-        this.currentPage = "대시보드";
+function startApp() {
 
-        this.initialize();
+    console.log("설천고 스포츠과학 분석센터 PRO");
+
+    console.log("Version :", getVersion());
+
+    initializeApp();
+
+}
+
+/* ===============================
+   초기화
+=============================== */
+
+function initializeApp() {
+
+    initializeSettings();
+
+    updateLanguage();
+
+    showSplash();
+
+}
+/* ===============================
+   Splash 화면
+=============================== */
+
+function showSplash() {
+
+    const splash = document.getElementById("splash");
+
+    if (!splash) {
+
+        loadDashboard();
+
+        return;
 
     }
 
-    /* ==========================
-        시작
-    ========================== */
+    splash.style.display = "flex";
 
-    initialize() {
+    let progress = 0;
 
-        this.initializeMenu();
+    const progressBar = document.getElementById("loadingBar");
 
-        this.initializeButtons();
+    const progressText = document.getElementById("loadingText");
 
-        this.showWelcome();
+    const loadingList = [
 
-        this.startClock();
+        "AI 엔진 로드 중...",
 
-        console.log("설천고 스포츠과학 분석센터 PRO 시작");
+        "MediaPipe 초기화...",
 
-    }
+        "카메라 확인...",
 
-    /* ==========================
-        사이드 메뉴
-    ========================== */
+        "Polar 연결 확인...",
 
-    initializeMenu() {
+        "환경설정 불러오는 중...",
 
-        const menus = document.querySelectorAll(".sidebar li");
+        "대시보드 준비 중..."
 
-        menus.forEach(menu => {
+    ];
 
-            menu.addEventListener("click", () => {
+    const timer = setInterval(() => {
 
-                menus.forEach(item => {
+        progress += 2;
 
-                    item.classList.remove("active");
+        if (progressBar) {
 
-                });
+            progressBar.style.width = progress + "%";
 
-                menu.classList.add("active");
+        }
 
-                this.currentPage = menu.innerText.trim();
+        if (progressText) {
 
-                this.changePage(this.currentPage);
+            const index = Math.min(
+
+                Math.floor(progress / 20),
+
+                loadingList.length - 1
+
+            );
+
+            progressText.innerText =
+
+                loadingList[index];
+
+        }
+
+        if (progress >= 100) {
+
+            clearInterval(timer);
+
+            setTimeout(() => {
+
+                splash.style.display = "none";
+
+                loadDashboard();
+
+            }, 500);
+
+        }
+
+    }, 60);
+
+}
+/* ===============================
+   대시보드
+=============================== */
+
+function loadDashboard() {
+
+    Utils.log("대시보드 로드");
+
+    updateDashboard();
+
+    initializeMenu();
+
+    initializeQuickButtons();
+
+}
+/* ===============================
+   대시보드 데이터
+=============================== */
+
+function updateDashboard() {
+
+    setText("athleteCount", loadAthletes().length);
+
+    setText("analysisCount", 0);
+
+    setText("reportCount", loadReports().length);
+
+    setText("sessionCount", 0);
+
+}
+/* ===============================
+   HTML 출력
+=============================== */
+
+function setText(id, value) {
+
+    const element = document.getElementById(id);
+
+    if (!element) return;
+
+    element.textContent = value;
+
+}
+/* ===============================
+   메뉴 이동
+=============================== */
+
+function initializeMenu() {
+
+    const menus = document.querySelectorAll(".sidebar li");
+
+    menus.forEach(menu => {
+
+        menu.addEventListener("click", () => {
+
+            menus.forEach(item => {
+
+                item.classList.remove("active");
 
             });
 
-        });
+            menu.classList.add("active");
 
-    }
+            const page = menu.innerText.trim();
 
-    /* ==========================
-        상단 버튼
-    ========================== */
-
-    initializeButtons() {
-
-        const buttons = document.querySelectorAll(".header-menu button");
-
-        buttons[0].addEventListener("click", () => {
-
-            alert("검색 기능은 준비 중입니다.");
+            changePage(page);
 
         });
 
-        buttons[1].addEventListener("click", () => {
+    });
 
-            alert("알림 기능은 준비 중입니다.");
+}
+/* ===============================
+   페이지 변경
+=============================== */
 
-        });
+function changePage(page) {
 
-        buttons[2].addEventListener("click", () => {
+    Utils.log(page + " 페이지");
 
-            this.toggleTheme();
+    switch(page){
 
-        });
+        case "대시보드":
 
-        buttons[3].addEventListener("click", () => {
+            updateDashboard();
 
-            alert("프로필 기능은 준비 중입니다.");
+            break;
 
-        });
+        case "선수관리":
 
-    }
+            loadAthletePage();
 
-    /* ==========================
-        첫 화면
-    ========================== */
+            break;
 
-    showWelcome() {
+        case "자세분석":
 
-        const content = document.getElementById("content");
+            loadPosePage();
 
-        content.innerHTML = `
+            break;
 
-            <div class="welcome-card">
+        case "영상분석":
 
-                <h2>환영합니다.</h2>
+            loadVideoPage();
 
-                <p>
+            break;
 
-                    설천고 스포츠과학 분석센터 PRO
+        case "히트맵":
 
-                </p>
+            loadHeatmapPage();
 
-                <br>
+            break;
 
-                <p>
+        case "웨이트":
 
-                    좌측 메뉴에서 원하는 분석을 선택하세요.
+            loadWeightPage();
 
-                </p>
+            break;
 
-            </div>
+        case "체대입시":
 
-        `;
+            loadPEPage();
 
-    }
+            break;
 
-    /* ==========================
-        페이지 변경
-    ========================== */
+        case "사격분석":
 
-    changePage(page) {
+            loadShootingPage();
 
-        const content = document.getElementById("content");
+            break;
 
-        content.innerHTML = `
+        case "바이애슬론":
 
-            <div class="welcome-card">
+            loadBiathlonPage();
 
-                <h2>${page}</h2>
+            break;
 
-                <p>
+        case "Polar":
 
-                    ${page} 기능은 현재 개발 중입니다.
+            loadPolarPage();
 
-                </p>
+            break;
 
-            </div>
+        case "리포트":
 
-        `;
+            loadReportPage();
 
-        console.log(page);
+            break;
 
-    }
+        case "설정":
 
-    /* ==========================
-        다크모드
-    ========================== */
+            loadSettingsPage();
 
-    toggleTheme() {
-
-        document.body.classList.toggle("light");
-
-    }
-
-    /* ==========================
-        시계
-    ========================== */
-
-    startClock() {
-
-        setInterval(() => {
-
-            const now = new Date();
-
-            console.log(now.toLocaleTimeString());
-
-        },1000);
+            break;
 
     }
 
 }
+/* ===============================
+   임시 페이지
+=============================== */
 
-/* ==========================
-        실행
-========================== */
+function loadAthletePage(){}
 
-window.addEventListener("DOMContentLoaded", () => {
+function loadPosePage(){}
 
-    new SportsScienceApp();
+function loadVideoPage(){}
 
-});
+function loadHeatmapPage(){}
+
+function loadWeightPage(){}
+
+function loadPEPage(){}
+
+function loadShootingPage(){}
+
+function loadBiathlonPage(){}
+
+function loadPolarPage(){}
+
+function loadReportPage(){}
+
+function loadSettingsPage(){}
+/* ===============================
+   빠른 실행 버튼
+=============================== */
+
+function initializeQuickButtons() {
+
+    connectButton("poseBtn", loadPosePage);
+
+    connectButton("videoBtn", loadVideoPage);
+
+    connectButton("weightBtn", loadWeightPage);
+
+    connectButton("reportBtn", loadReportPage);
+
+    connectButton("polarBtn", loadPolarPage);
+
+    connectButton("biathlonBtn", loadBiathlonPage);
+
+}
+
+/* ===============================
+   버튼 연결
+=============================== */
+
+function connectButton(id, callback) {
+
+    const button = document.getElementById(id);
+
+    if (!button) return;
+
+    button.addEventListener("click", callback);
+
+}
+/* ===============================
+   실시간 시계
+=============================== */
+
+function startClock() {
+
+    updateClock();
+
+    setInterval(updateClock, 1000);
+
+}
+
+function updateClock() {
+
+    const clock = document.getElementById("clock");
+
+    if (!clock) return;
+
+    const now = new Date();
+
+    clock.innerHTML =
+
+        now.toLocaleDateString("ko-KR")
+
+        +
+
+        " "
+
+        +
+
+        now.toLocaleTimeString("ko-KR");
+
+}
+/* ===============================
+   프로그램 종료
+=============================== */
+
+function shutdownApp() {
+
+    console.clear();
+
+    Utils.log("프로그램 종료");
+
+}
+/* ===============================
+   프로그램 정보
+=============================== */
+
+function appInfo() {
+
+    console.table({
+
+        프로그램: CONFIG.APP_NAME,
+
+        버전: CONFIG.VERSION,
+
+        제작자: CONFIG.AUTHOR,
+
+        학교: CONFIG.COMPANY
+
+    });
+
+}
+function initializeApp() {
+
+    initializeSettings();
+
+    updateLanguage();
+
+    startClock();
+
+    appInfo();
+
+    showSplash();
+
+}
