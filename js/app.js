@@ -1,411 +1,1104 @@
 /*
 =========================================================
- 설천고 스포츠과학 분석센터 PRO
- File : app.js
- Part 1
+ 설천고 스포츠과학 훈련센터 PRO
+ Main Application
+ Version 2.0.0
 =========================================================
 */
 
-document.addEventListener("DOMContentLoaded", startApp);
+const App = {
 
-/* ===============================
-   프로그램 시작
-=============================== */
+    version : "2.0.0",
 
-function startApp() {
+    initialized : false,
 
-    console.log("설천고 스포츠과학 분석센터 PRO");
+    currentPage : "dashboard",
 
-    console.log("Version :", getVersion());
+    modules : {},
 
-    initializeApp();
+    language : "ko",
 
-}
+    theme : "light"
 
-/* ===============================
-   초기화
-=============================== */
+};
 
-function initializeApp() {
+/* ==========================================
+   앱 시작
+========================================== */
+
+async function initializeApp(){
+
+    console.log(
+
+        "Seolcheon Sports Science PRO"
+
+    );
+
+    initializeStorage();
 
     initializeSettings();
 
-    updateLanguage();
+    initializeLanguage();
 
-    showSplash();
+    initializeFirebase(firebaseConfig);
+
+    initializeDashboard();
+
+    initializePose();
+
+    initializeCamera();
+
+    initializeVideo();
+
+    initializeHeatmap();
+
+    initializeWeight();
+
+    initializeShooting();
+
+    initializeBiathlon();
+
+    initializePolar();
+
+    initializeAI();
+
+    initializeReport();
+
+    initializeAthlete();
+
+    initializeRouter();
+
+    loadApplicationSettings();
+
+    App.initialized = true;
 
 }
-/* ===============================
-   Splash 화면
-=============================== */
 
-function showSplash() {
+/* ==========================================
+   라우터
+========================================== */
 
-    const splash = document.getElementById("splash");
+function initializeRouter(){
 
-    if (!splash) {
+    window.addEventListener(
 
-        loadDashboard();
+        "hashchange",
+
+        handleRoute
+
+    );
+
+    handleRoute();
+
+}
+
+/* ==========================================
+   페이지 이동
+========================================== */
+
+function navigate(page){
+
+    location.hash = page;
+
+}
+
+/* ==========================================
+   라우트 처리
+========================================== */
+
+function handleRoute(){
+
+    const page =
+
+        location.hash.replace("#","")
+
+        || "dashboard";
+
+    App.currentPage = page;
+
+    showPage(page);
+
+}
+
+/* ==========================================
+   페이지 표시
+========================================== */
+
+function showPage(page){
+
+    document
+
+        .querySelectorAll(".page")
+
+        .forEach(item=>{
+
+            item.style.display="none";
+
+        });
+
+    const target =
+
+        document.getElementById(page);
+
+    if(target){
+
+        target.style.display="block";
+
+    }
+
+}
+/* ==========================================
+   로그인 상태 확인
+========================================== */
+
+async function checkAuthentication(){
+
+    return new Promise(resolve=>{
+
+        FirebaseManager.auth.onAuthStateChanged(
+
+            user=>{
+
+                if(user){
+
+                    App.user=user;
+
+                    resolve(true);
+
+                }else{
+
+                    App.user=null;
+
+                    navigate("login");
+
+                    resolve(false);
+
+                }
+
+            }
+
+        );
+
+    });
+
+}
+
+/* ==========================================
+   사용자 권한
+========================================== */
+
+async function loadUserRole(){
+
+    if(!App.user){
 
         return;
 
     }
 
-    splash.style.display = "flex";
+    App.role=
 
-    let progress = 0;
+        await getUserRole(
 
-    const progressBar = document.getElementById("loadingBar");
+            App.user.uid
 
-    const progressText = document.getElementById("loadingText");
-
-    const loadingList = [
-
-        "AI 엔진 로드 중...",
-
-        "MediaPipe 초기화...",
-
-        "카메라 확인...",
-
-        "Polar 연결 확인...",
-
-        "환경설정 불러오는 중...",
-
-        "대시보드 준비 중..."
-
-    ];
-
-    const timer = setInterval(() => {
-
-        progress += 2;
-
-        if (progressBar) {
-
-            progressBar.style.width = progress + "%";
-
-        }
-
-        if (progressText) {
-
-            const index = Math.min(
-
-                Math.floor(progress / 20),
-
-                loadingList.length - 1
-
-            );
-
-            progressText.innerText =
-
-                loadingList[index];
-
-        }
-
-        if (progress >= 100) {
-
-            clearInterval(timer);
-
-            setTimeout(() => {
-
-                splash.style.display = "none";
-
-                loadDashboard();
-
-            }, 500);
-
-        }
-
-    }, 60);
+        );
 
 }
-/* ===============================
-   대시보드
-=============================== */
 
-function loadDashboard() {
+/* ==========================================
+   권한 확인
+========================================== */
 
-    Utils.log("대시보드 로드");
+function hasPermission(role){
 
-    updateDashboard();
+    const level={
 
-    initializeMenu();
+        guest:0,
 
-    initializeQuickButtons();
+        athlete:1,
 
-}
-/* ===============================
-   대시보드 데이터
-=============================== */
+        coach:2,
 
-function updateDashboard() {
+        admin:3
 
-    setText("athleteCount", loadAthletes().length);
+    };
 
-    setText("analysisCount", 0);
+    return level[App.role] >=
 
-    setText("reportCount", loadReports().length);
-
-    setText("sessionCount", 0);
+           level[role];
 
 }
-/* ===============================
-   HTML 출력
-=============================== */
 
-function setText(id, value) {
+/* ==========================================
+   언어 적용
+========================================== */
 
-    const element = document.getElementById(id);
+function applyAppLanguage(){
 
-    if (!element) return;
+    const language=
 
-    element.textContent = value;
+        localStorage.getItem(
 
-}
-/* ===============================
-   메뉴 이동
-=============================== */
+            "language"
 
-function initializeMenu() {
+        ) || "ko";
 
-    const menus = document.querySelectorAll(".sidebar li");
+    App.language=language;
 
-    menus.forEach(menu => {
-
-        menu.addEventListener("click", () => {
-
-            menus.forEach(item => {
-
-                item.classList.remove("active");
-
-            });
-
-            menu.classList.add("active");
-
-            const page = menu.innerText.trim();
-
-            changePage(page);
-
-        });
-
-    });
+    applyLanguage(language);
 
 }
-/* ===============================
-   페이지 변경
-=============================== */
 
-function changePage(page) {
+/* ==========================================
+   테마 적용
+========================================== */
 
-    Utils.log(page + " 페이지");
+function applyAppTheme(){
 
-    switch(page){
+    const theme=
 
-        case "대시보드":
+        localStorage.getItem(
 
-            updateDashboard();
+            "theme"
 
-            break;
+        ) || "light";
 
-        case "선수관리":
+    App.theme=theme;
 
-            loadAthletePage();
+    applyTheme(theme);
 
-            break;
+}
 
-        case "자세분석":
+/* ==========================================
+   설정 불러오기
+========================================== */
 
-            loadPosePage();
+function loadApplicationSettings(){
 
-            break;
+    applyAppLanguage();
 
-        case "영상분석":
+    applyAppTheme();
 
-            loadVideoPage();
+}
 
-            break;
+/* ==========================================
+   설정 저장
+========================================== */
 
-        case "히트맵":
+function saveApplicationSettings(){
 
-            loadHeatmapPage();
+    localStorage.setItem(
 
-            break;
+        "language",
 
-        case "웨이트":
+        App.language
 
-            loadWeightPage();
+    );
 
-            break;
+    localStorage.setItem(
 
-        case "체대입시":
+        "theme",
 
-            loadPEPage();
+        App.theme
 
-            break;
+    );
 
-        case "사격분석":
+}
 
-            loadShootingPage();
+/* ==========================================
+   모바일 확인
+========================================== */
 
-            break;
+function isMobile(){
 
-        case "바이애슬론":
+    return /Android|iPhone|iPad|iPod/i
 
-            loadBiathlonPage();
+        .test(
 
-            break;
+            navigator.userAgent
 
-        case "Polar":
+        );
 
-            loadPolarPage();
+}
 
-            break;
+/* ==========================================
+   레이아웃
+========================================== */
 
-        case "리포트":
+function updateLayout(){
 
-            loadReportPage();
+    const body=document.body;
 
-            break;
+    body.classList.remove(
 
-        case "설정":
+        "mobile",
 
-            loadSettingsPage();
+        "tablet",
 
-            break;
+        "desktop"
+
+    );
+
+    if(window.innerWidth<768){
+
+        body.classList.add(
+
+            "mobile"
+
+        );
+
+    }
+
+    else if(window.innerWidth<1200){
+
+        body.classList.add(
+
+            "tablet"
+
+        );
+
+    }
+
+    else{
+
+        body.classList.add(
+
+            "desktop"
+
+        );
 
     }
 
 }
-/* ===============================
-   임시 페이지
-=============================== */
 
-function loadAthletePage(){}
+/* ==========================================
+   Resize
+========================================== */
 
-function loadPosePage(){}
+window.addEventListener(
 
-function loadVideoPage(){}
+    "resize",
 
-function loadHeatmapPage(){}
+    updateLayout
 
-function loadWeightPage(){}
+);
+/* ==========================================
+   카메라 자동 연결
+========================================== */
 
-function loadPEPage(){}
+async function connectCameraModule(){
 
-function loadShootingPage(){}
+    try{
 
-function loadBiathlonPage(){}
+        if(typeof initializeCamera==="function"){
 
-function loadPolarPage(){}
+            await initializeCamera();
 
-function loadReportPage(){}
+        }
 
-function loadSettingsPage(){}
-/* ===============================
-   빠른 실행 버튼
-=============================== */
+    }catch(error){
 
-function initializeQuickButtons() {
+        console.error(error);
 
-    connectButton("poseBtn", loadPosePage);
-
-    connectButton("videoBtn", loadVideoPage);
-
-    connectButton("weightBtn", loadWeightPage);
-
-    connectButton("reportBtn", loadReportPage);
-
-    connectButton("polarBtn", loadPolarPage);
-
-    connectButton("biathlonBtn", loadBiathlonPage);
+    }
 
 }
 
-/* ===============================
-   버튼 연결
-=============================== */
+/* ==========================================
+   Polar 자동 연결
+========================================== */
 
-function connectButton(id, callback) {
+async function connectPolarModule(){
 
-    const button = document.getElementById(id);
+    try{
 
-    if (!button) return;
+        if(typeof connectPolar==="function"){
 
-    button.addEventListener("click", callback);
+            await connectPolar();
 
-}
-/* ===============================
-   실시간 시계
-=============================== */
+        }
 
-function startClock() {
+    }catch(error){
 
-    updateClock();
+        console.error(error);
 
-    setInterval(updateClock, 1000);
+    }
 
 }
 
-function updateClock() {
+/* ==========================================
+   AI 엔진 시작
+========================================== */
 
-    const clock = document.getElementById("clock");
+function startAIEngine(){
 
-    if (!clock) return;
+    if(typeof initializeAI==="function"){
 
-    const now = new Date();
+        initializeAI();
 
-    clock.innerHTML =
-
-        now.toLocaleDateString("ko-KR")
-
-        +
-
-        " "
-
-        +
-
-        now.toLocaleTimeString("ko-KR");
+    }
 
 }
-/* ===============================
-   프로그램 종료
-=============================== */
 
-function shutdownApp() {
+/* ==========================================
+   Firebase 동기화
+========================================== */
 
-    console.clear();
+async function synchronizeApplication(){
 
-    Utils.log("프로그램 종료");
+    try{
+
+        if(typeof synchronizeAll==="function"){
+
+            await synchronizeAll();
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+    }
 
 }
-/* ===============================
-   프로그램 정보
-=============================== */
 
-function appInfo() {
+/* ==========================================
+   Dashboard 자동 갱신
+========================================== */
 
-    console.table({
+function startDashboardRefresh(){
 
-        프로그램: CONFIG.APP_NAME,
+    setInterval(()=>{
 
-        버전: CONFIG.VERSION,
+        if(typeof refreshDashboard==="function"){
 
-        제작자: CONFIG.AUTHOR,
+            refreshDashboard();
 
-        학교: CONFIG.COMPANY
+        }
+
+    },1000);
+
+}
+
+/* ==========================================
+   Report 자동 생성
+========================================== */
+
+function autoGenerateReport(){
+
+    setInterval(()=>{
+
+        if(typeof createReport==="function"){
+
+            createReport();
+
+        }
+
+    },60000);
+
+}
+
+/* ==========================================
+   자동 저장
+========================================== */
+
+function autoSave(){
+
+    setInterval(()=>{
+
+        try{
+
+            if(typeof saveWeightData==="function"){
+
+                saveWeightData();
+
+            }
+
+            if(typeof saveShootingData==="function"){
+
+                saveShootingData();
+
+            }
+
+            if(typeof saveBiathlonData==="function"){
+
+                saveBiathlonData();
+
+            }
+
+        }catch(error){
+
+            console.error(error);
+
+        }
+
+    },30000);
+
+}
+
+/* ==========================================
+   네트워크 상태
+========================================== */
+
+function monitorNetwork(){
+
+    function update(){
+
+        const status=
+
+            navigator.onLine
+
+            ?"online"
+
+            :"offline";
+
+        document.body.dataset.network=
+
+            status;
+
+        console.log(
+
+            "Network :",
+
+            status
+
+        );
+
+    }
+
+    window.addEventListener(
+
+        "online",
+
+        update
+
+    );
+
+    window.addEventListener(
+
+        "offline",
+
+        update
+
+    );
+
+    update();
+
+}
+
+/* ==========================================
+   전체 서비스 시작
+========================================== */
+
+async function startServices(){
+
+    await connectCameraModule();
+
+    await connectPolarModule();
+
+    startAIEngine();
+
+    synchronizeApplication();
+
+    startDashboardRefresh();
+
+    autoGenerateReport();
+
+    autoSave();
+
+    monitorNetwork();
+
+}
+/* ==========================================
+   Service Worker 등록
+========================================== */
+
+async function registerServiceWorker(){
+
+    if(!("serviceWorker" in navigator)){
+
+        return;
+
+    }
+
+    try{
+
+        const registration =
+
+            await navigator.serviceWorker.register(
+
+                "/sw.js"
+
+            );
+
+        App.serviceWorker = registration;
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+/* ==========================================
+   업데이트 확인
+========================================== */
+
+async function checkForUpdates(){
+
+    if(!App.serviceWorker){
+
+        return;
+
+    }
+
+    try{
+
+        await App.serviceWorker.update();
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+/* ==========================================
+   설치 프롬프트
+========================================== */
+
+let installPrompt = null;
+
+window.addEventListener(
+
+    "beforeinstallprompt",
+
+    event=>{
+
+        event.preventDefault();
+
+        installPrompt = event;
+
+    }
+
+);
+
+async function installApplication(){
+
+    if(!installPrompt){
+
+        return;
+
+    }
+
+    installPrompt.prompt();
+
+    await installPrompt.userChoice;
+
+    installPrompt = null;
+
+}
+
+/* ==========================================
+   Push Notification
+========================================== */
+
+async function initializePushNotification(){
+
+    if(!("Notification" in window)){
+
+        return;
+
+    }
+
+    if(Notification.permission==="default"){
+
+        await Notification.requestPermission();
+
+    }
+
+}
+
+/* ==========================================
+   전역 오류
+========================================== */
+
+window.addEventListener(
+
+    "error",
+
+    event=>{
+
+        console.error(
+
+            "[APP ERROR]",
+
+            event.error
+
+        );
+
+    }
+
+);
+
+window.addEventListener(
+
+    "unhandledrejection",
+
+    event=>{
+
+        console.error(
+
+            "[PROMISE ERROR]",
+
+            event.reason
+
+        );
+
+    }
+
+);
+
+/* ==========================================
+   성능 모니터
+========================================== */
+
+function startPerformanceMonitor(){
+
+    setInterval(()=>{
+
+        if(window.performance){
+
+            console.log(
+
+                "Memory :",
+
+                performance.memory
+
+            );
+
+        }
+
+    },10000);
+
+}
+
+/* ==========================================
+   시스템 로그
+========================================== */
+
+const SystemLog=[];
+
+function addSystemLog(type,message){
+
+    SystemLog.push({
+
+        type,
+
+        message,
+
+        time:new Date()
 
     });
 
-}
-function initializeApp() {
+    if(SystemLog.length>1000){
 
-    initializeSettings();
+        SystemLog.shift();
 
-    updateLanguage();
-
-    startClock();
-
-    appInfo();
-
-    showSplash();
+    }
 
 }
+
+function exportSystemLog(){
+
+    const json=
+
+        JSON.stringify(
+
+            SystemLog,
+
+            null,
+
+            2
+
+        );
+
+    Utils.download(
+
+        "system-log.json",
+
+        json
+
+    );
+
+}
+
+/* ==========================================
+   앱 시작
+========================================== */
+
+async function startApplication(){
+
+    await initializeApp();
+
+    await checkAuthentication();
+
+    await loadUserRole();
+
+    await registerServiceWorker();
+
+    await initializePushNotification();
+
+    await startServices();
+
+    startPerformanceMonitor();
+
+    addSystemLog(
+
+        "SYSTEM",
+
+        "Application Started"
+
+    );
+
+}
+/* ==========================================
+   모든 모듈 연결
+========================================== */
+
+async function initializeModules(){
+
+    const modules=[
+
+        initializeStorage,
+        initializeSettings,
+        initializeLanguage,
+        initializeFirebase,
+        initializeAthlete,
+        initializeDashboard,
+        initializeCamera,
+        initializeVideo,
+        initializePose,
+        initializeHeatmap,
+        initializeWeight,
+        initializeShooting,
+        initializeBiathlon,
+        initializePolar,
+        initializeAI,
+        initializeReport
+
+    ];
+
+    for(const module of modules){
+
+        if(typeof module==="function"){
+
+            try{
+
+                await module();
+
+            }
+
+            catch(error){
+
+                console.error(error);
+
+            }
+
+        }
+
+    }
+
+}
+
+/* ==========================================
+   프로젝트 상태 점검
+========================================== */
+
+function selfCheck(){
+
+    return{
+
+        firebase:FirebaseManager.initialized,
+
+        dashboard:DashboardManager.initialized,
+
+        ai:AIManager!==undefined,
+
+        camera:CameraManager!==undefined,
+
+        polar:PolarManager.connected,
+
+        network:navigator.onLine,
+
+        version:App.version
+
+    };
+
+}
+
+/* ==========================================
+   버전 확인
+========================================== */
+
+async function checkVersion(){
+
+    try{
+
+        const version=
+
+            await checkAppVersion();
+
+        if(
+
+            version &&
+
+            version.version!==App.version
+
+        ){
+
+            console.log(
+
+                "새 버전 발견",
+
+                version.version
+
+            );
+
+        }
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+/* ==========================================
+   메모리 최적화
+========================================== */
+
+function optimizeMemory(){
+
+    if(window.gc){
+
+        window.gc();
+
+    }
+
+    DashboardManager.charts={
+
+        ...DashboardManager.charts
+
+    };
+
+}
+
+/* ==========================================
+   Splash 제거
+========================================== */
+
+function hideSplash(){
+
+    const splash=
+
+        document.getElementById(
+
+            "splash"
+
+        );
+
+    if(!splash){
+
+        return;
+
+    }
+
+    splash.classList.add(
+
+        "fade-out"
+
+    );
+
+    setTimeout(()=>{
+
+        splash.remove();
+
+    },600);
+
+}
+
+/* ==========================================
+   Release Mode
+========================================== */
+
+function enableReleaseMode(){
+
+    console.log(
+
+        "Release Mode Enabled"
+
+    );
+
+    App.release=true;
+
+}
+
+/* ==========================================
+   종료
+========================================== */
+
+function shutdownApplication(){
+
+    destroyDashboard();
+
+    destroyPolar();
+
+    destroyAI();
+
+    destroyFirebase();
+
+    App.initialized=false;
+
+}
+
+/* ==========================================
+   메인 실행
+========================================== */
+
+window.addEventListener(
+
+    "load",
+
+    async()=>{
+
+        await initializeModules();
+
+        await startApplication();
+
+        await checkVersion();
+
+        optimizeMemory();
+
+        enableReleaseMode();
+
+        hideSplash();
+
+        console.log(
+
+            selfCheck()
+
+        );
+
+    }
+
+);
