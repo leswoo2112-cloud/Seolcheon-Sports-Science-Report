@@ -1,0 +1,318 @@
+/* ==========================================================
+   SEOLCHEON SPORTS SCIENCE PRO
+   Version : 1.0
+   File : main.css
+========================================================== */
+
+:root{
+
+    --bg:#08111d;
+    --sidebar:#0d1828;
+    --card:#132235;
+    --header:#102033;
+
+    --primary:#2F80ED;
+    --primary2:#56CCF2;
+
+    --text:#ffffff;
+    --text2:#b9c4d4;
+
+    --border:rgba(255,255,255,.08);
+
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+
+}
+
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+}
+
+body{
+
+    font-family:Pretendard,sans-serif;
+
+    background:linear-gradient(135deg,#08111d,#0b1730,#0d1f3f);
+
+    color:var(--text);
+
+    overflow:hidden;
+
+}
+
+.app{
+
+    display:flex;
+
+    width:100vw;
+
+    height:100vh;
+
+}
+
+/* =========================
+        Sidebar
+========================= */
+
+.sidebar{
+
+    width:280px;
+
+    background:rgba(13,24,40,.95);
+
+    backdrop-filter:blur(15px);
+
+    border-right:1px solid var(--border);
+
+    display:flex;
+
+    flex-direction:column;
+
+    box-shadow:var(--shadow);
+
+}
+
+.logo{
+
+    padding:35px;
+
+    text-align:center;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.logo h2{
+
+    font-size:34px;
+
+    color:var(--primary2);
+
+}
+
+.logo p{
+
+    margin-top:10px;
+
+    color:var(--text2);
+
+    font-size:13px;
+
+}
+
+/* =========================
+        Menu
+========================= */
+
+.sidebar ul{
+
+    list-style:none;
+
+    padding:20px;
+
+}
+
+.sidebar li{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:15px 18px;
+
+    margin-bottom:10px;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    color:var(--text2);
+
+}
+
+.sidebar li:hover{
+
+    background:rgba(47,128,237,.15);
+
+    color:#fff;
+
+}
+
+.sidebar li.active{
+
+    background:linear-gradient(90deg,#2F80ED,#56CCF2);
+
+    color:white;
+
+}
+
+/* =========================
+        Main
+========================= */
+
+.main{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+/* =========================
+        Header
+========================= */
+
+.header{
+
+    height:80px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 35px;
+
+    background:rgba(16,32,51,.95);
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.header h1{
+
+    font-size:26px;
+
+    letter-spacing:1px;
+
+}
+
+.header span{
+
+    color:var(--text2);
+
+}
+
+.header-right{
+
+    display:flex;
+
+    gap:15px;
+
+}
+
+.header-right button{
+
+    width:46px;
+
+    height:46px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:var(--card);
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    font-size:18px;
+
+}
+
+.header-right button:hover{
+
+    background:var(--primary);
+
+}
+
+/* =========================
+        Dashboard
+========================= */
+
+.dashboard{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:25px;
+
+    padding:35px;
+
+}
+
+.card{
+
+    background:rgba(19,34,53,.85);
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    padding:30px;
+
+    box-shadow:var(--shadow);
+
+    transition:.3s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-6px);
+
+    border-color:var(--primary);
+
+}
+
+.card h3{
+
+    color:var(--text2);
+
+    margin-bottom:15px;
+
+}
+
+.card h2{
+
+    font-size:42px;
+
+    color:var(--primary2);
+
+}
+
+/* =========================
+        Content
+========================= */
+
+#content{
+
+    flex:1;
+
+    margin:0 35px 35px;
+
+    background:rgba(19,34,53,.75);
+
+    border-radius:20px;
+
+    border:1px solid var(--border);
+
+    box-shadow:var(--shadow);
+
+    overflow:hidden;
+
+}
