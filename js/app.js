@@ -1,6 +1,6 @@
 /*
 ==========================================================
-SEOLCHEON SPORTS SCIENCE PRO
+설천고 스포츠과학 분석센터 PRO
 Version : 1.0
 File : app.js
 ==========================================================
@@ -10,29 +10,35 @@ class SportsScienceApp {
 
     constructor() {
 
-        this.currentPage = "dashboard";
+        this.currentPage = "대시보드";
 
-        this.init();
-
-    }
-
-    init() {
-
-        this.initSidebar();
-
-        this.initHeader();
-
-        this.loadDashboard();
-
-        console.log("SEOLCHEON SPORTS SCIENCE PRO");
+        this.initialize();
 
     }
 
     /* ==========================
-        Sidebar
+        시작
     ========================== */
 
-    initSidebar() {
+    initialize() {
+
+        this.initializeMenu();
+
+        this.initializeButtons();
+
+        this.showWelcome();
+
+        this.startClock();
+
+        console.log("설천고 스포츠과학 분석센터 PRO 시작");
+
+    }
+
+    /* ==========================
+        사이드 메뉴
+    ========================== */
+
+    initializeMenu() {
 
         const menus = document.querySelectorAll(".sidebar li");
 
@@ -40,7 +46,11 @@ class SportsScienceApp {
 
             menu.addEventListener("click", () => {
 
-                menus.forEach(item => item.classList.remove("active"));
+                menus.forEach(item => {
+
+                    item.classList.remove("active");
+
+                });
 
                 menu.classList.add("active");
 
@@ -55,63 +65,75 @@ class SportsScienceApp {
     }
 
     /* ==========================
-        Header
+        상단 버튼
     ========================== */
 
-    initHeader() {
+    initializeButtons() {
 
-        const buttons = document.querySelectorAll(".header-right button");
+        const buttons = document.querySelectorAll(".header-menu button");
 
-        buttons.forEach((button,index)=>{
+        buttons[0].addEventListener("click", () => {
 
-            button.addEventListener("click",()=>{
+            alert("검색 기능은 준비 중입니다.");
 
-                switch(index){
+        });
 
-                    case 0:
-                        console.log("Search");
-                        break;
+        buttons[1].addEventListener("click", () => {
 
-                    case 1:
-                        this.toggleDarkMode();
-                        break;
+            alert("알림 기능은 준비 중입니다.");
 
-                    case 2:
-                        console.log("Profile");
-                        break;
+        });
 
-                }
+        buttons[2].addEventListener("click", () => {
 
-            });
+            this.toggleTheme();
+
+        });
+
+        buttons[3].addEventListener("click", () => {
+
+            alert("프로필 기능은 준비 중입니다.");
 
         });
 
     }
 
     /* ==========================
-        Dashboard
+        첫 화면
     ========================== */
 
-    loadDashboard() {
+    showWelcome() {
 
         const content = document.getElementById("content");
 
         content.innerHTML = `
 
-        <div class="welcome">
+            <div class="welcome-card">
 
-            <h2>Welcome</h2>
+                <h2>환영합니다.</h2>
 
-            <p>SEOLCHEON SPORTS SCIENCE PRO</p>
+                <p>
 
-        </div>
+                    설천고 스포츠과학 분석센터 PRO
+
+                </p>
+
+                <br>
+
+                <p>
+
+                    좌측 메뉴에서 원하는 분석을 선택하세요.
+
+                </p>
+
+            </div>
 
         `;
 
     }
 
     /* ==========================
-        Page
+        페이지 변경
     ========================== */
 
     changePage(page) {
@@ -120,13 +142,17 @@ class SportsScienceApp {
 
         content.innerHTML = `
 
-        <div class="page">
+            <div class="welcome-card">
 
-            <h2>${page}</h2>
+                <h2>${page}</h2>
 
-            <p>준비 중...</p>
+                <p>
 
-        </div>
+                    ${page} 기능은 현재 개발 중입니다.
+
+                </p>
+
+            </div>
 
         `;
 
@@ -135,20 +161,38 @@ class SportsScienceApp {
     }
 
     /* ==========================
-        Dark Mode
+        다크모드
     ========================== */
 
-    toggleDarkMode() {
+    toggleTheme() {
 
         document.body.classList.toggle("light");
 
     }
 
+    /* ==========================
+        시계
+    ========================== */
+
+    startClock() {
+
+        setInterval(() => {
+
+            const now = new Date();
+
+            console.log(now.toLocaleTimeString());
+
+        },1000);
+
+    }
+
 }
 
-/* ===================================== */
+/* ==========================
+        실행
+========================== */
 
-window.addEventListener("DOMContentLoaded",()=>{
+window.addEventListener("DOMContentLoaded", () => {
 
     new SportsScienceApp();
 
